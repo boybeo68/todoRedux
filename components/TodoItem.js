@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {View, Text, StyleSheet, Alert, TouchableOpacity,AsyncStorage } from 'react-native';
+import {View, Text, StyleSheet, Alert, TouchableOpacity, AsyncStorage} from 'react-native';
 import {SwipeRow, Icon, Button} from 'native-base'
 import {deleteTodo, editTodo, doneTdodo} from '../redux/actionCreator'
 import {connect} from 'react-redux'
@@ -8,9 +8,6 @@ import {connect} from 'react-redux'
 // import styles from './styles';
 
 class TodoItem extends Component {
-    showEditModal = (PopupDialog,name) => {
-        PopupDialog.show();
-    };
     showDelete = (id) => {
         Alert.alert(
             'Alert',
@@ -26,9 +23,13 @@ class TodoItem extends Component {
             {cancelable: true}
         );
     };
+    showEditModal = (popupDialogComponent,id,name) => {
+        // todo sử dụng refs với redux
+        popupDialogComponent.getWrappedInstance().editDialogComponent(id,name);
+    };
 
     render() {
-        const {todo,PopupDialog} = this.props;
+        const {todo, popupDialogComponent} = this.props;
         const textDecorationLine = todo.done ? 'line-through' : 'none';
         const color = todo.done ? 'red' : '#fff';
         return (
@@ -36,8 +37,10 @@ class TodoItem extends Component {
                 rightOpenValue={-75}
                 body={
                     <View style={styles.todoItem}>
-                        <TouchableOpacity onPress={() => {this.props.doneTdodo(todo.id)}}>
-                            <Text style={{color, fontSize: 15,textDecorationLine}}>{todo.name}</Text>
+                        <TouchableOpacity onPress={() => {
+                            this.props.doneTdodo(todo.id)
+                        }}>
+                            <Text style={{color, fontSize: 15, textDecorationLine}}>{todo.name}</Text>
                         </TouchableOpacity>
                     </View>
                 }
@@ -46,7 +49,8 @@ class TodoItem extends Component {
                         <Button style={{marginBottom: 5}} small rounded danger onPress={() => this.showDelete(todo.id)}>
                             <Icon active name="trash"/>
                         </Button>
-                        <Button small rounded primary onPress={() => this.showEditModal(PopupDialog,todo.name)}>
+                        <Button small rounded primary
+                                onPress={() => this.showEditModal(popupDialogComponent, todo.id, todo.name)}>
                             <Icon active name="ios-build-outline"/>
                         </Button>
                     </View>

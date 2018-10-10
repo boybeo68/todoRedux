@@ -5,9 +5,10 @@ export function AddTodo(name) {
     }
 }
 
-export function editTodo(name) {
+export function editTodo(id, name) {
     return {
         type: 'editTodo',
+        id,
         name
     }
 }
@@ -26,8 +27,21 @@ export function doneTdodo(id) {
     }
 }
 
-export function getData() {
+export function GetData(data) {
     return {
-        type:'getData'
+        type: 'GetData',
+        data
+    }
+}
+
+export function DeleteAll() {
+    return {
+        type: 'DeleteAll'
+    }
+}
+
+export function DoneAll() {
+    return {
+        type: 'DoneAll'
     }
 }

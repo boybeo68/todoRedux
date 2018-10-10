@@ -1,14 +1,10 @@
 import React, {Component} from 'react';
-
-import {View, Text, StyleSheet, Image, Dimensions, FlatList, TextInput, TouchableOpacity,AsyncStorage } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, FlatList, TextInput, AsyncStorage} from 'react-native';
 import {connect} from 'react-redux'
-import {Container, Content, Header, Left, Right, Body, Button, Icon, Fab, Footer} from 'native-base'
+import {Container, Content, Header, Button, Icon, Fab} from 'native-base'
 import TodoItem from './TodoItem'
-import {AddTodo,getData} from '../redux/actionCreator'
-import PopupDialog, {SlideAnimation, DialogTitle} from 'react-native-popup-dialog';
-// import realm from '../database/allSchemas'
-
-// import styles from './styles';
+import {AddTodo, GetData, DeleteAll, DoneAll} from '../redux/actionCreator'
+import PopupDialogComponents from './PopupDialog'
 
 const width = Dimensions.get('window').width;
 
@@ -18,9 +14,12 @@ class MainTodoList extends Component {
         this.state = {
             active: false,
             name: '',
-            nameEdit: ''
         };
     }
+    deleteAll = async () =>{
+      await  this.props.DeleteAll();
+        this._storeData(this.props.defaultTodoList)
+    };
 
     _storeData = async (todos) => {
         try {
@@ -29,10 +28,22 @@ class MainTodoList extends Component {
             alert(error)
         }
     };
+    addTodo = async () => {
+        await this.props.AddTodo(this.state.name);
+        this._storeData(this.props.defaultTodoList)
+    };
 
-    componentWillMount(){
-        
+    componentWillMount() {
+        AsyncStorage.getItem('todos').then(value => {
+            if (value !== null) {
+                let initialStore = JSON.parse(value);
+                this.props.GetData(initialStore);
+            } else {
+
+            }
+        });
     }
+
     render() {
         return (
             <Container>
@@ -58,15 +69,16 @@ class MainTodoList extends Component {
                                        if (this.state.name.trim().length < 1) {
                                            alert('Please insert to do')
                                        } else {
-                                           this.props.AddTodo(this.state.name);
+                                           this.addTodo();
                                            this.state.name = '';
-                                           this._storeData(this.props.defaultTodoList)
                                        }
                                    }}
                                    onChangeText={text => this.setState({name: text})}/>
                     </View>
 
-                    <FlatList data={this.props.defaultTodoList} renderItem={({item, index}) => <TodoItem PopupDialog={this.popupDialog} todo={item}/>}
+                    <FlatList data={this.props.defaultTodoList}
+                              renderItem={({item, index}) => <TodoItem popupDialogComponent={this.popupDialogComponent}
+                                                                       todo={item}/>}
                               keyExtractor={item => item.id.toString()}>
                     </FlatList>
                 </Content>
@@ -82,67 +94,23 @@ class MainTodoList extends Component {
                         <Icon name="ios-search"/>
                     </Button>
                     <Button style={{backgroundColor: '#3B5998'}} onPress={() => {
-                        this.popupDialog.show();
+                        this.deleteAll();
                     }}>
                         <Icon name="md-trash"/>
                     </Button>
                     <Button style={{backgroundColor: '#DD5144'}} onPress={() => {
-                        if (this.state.name.trim().length < 1) {
-                            alert('Please insert to do')
-                        } else {
-                            this.props.AddTodo(this.state.name);
-                            this.state.name = ''
-                        }
+                        this.props.DoneAll()
                     }}>
-                        <Icon name="ios-add"/>
+                        <Icon name="md-done-all"/>
                     </Button>
                 </Fab>
-                <PopupDialog
-                    width={0.7} height={0.4}
-                    ref={(popupDialog) => {
-                        this.popupDialog = popupDialog;
-                    }}
-                >
-                    <Header transparent>
-                        <View style={{
-                            flex: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: '#46529D',
-                            height: 40,
-                            borderRadius: 5
-                        }}>
-                            <Text style={{textAlign: 'center', fontSize: 18, fontWeight: 'bold', color: '#fff'}}>
-                                Edit Todo
-                            </Text>
-                        </View>
-                    </Header>
-                    <Content>
-                        <TextInput style={{
-                            borderRadius: 5,
-                            borderWidth: 1,
-                            borderColor: '#5067FF',
-                            padding: 10,
-                            marginHorizontal: 10
-                        }} placeholder='Edit todo ' autoCorrect={false}
-                                   underlineColorAndroid="transparent" placeholderTextColor='#8DA1D4'
-                                   value={this.state.name}
-                                   onChangeText={text => this.setState({nameEdit: text})}/>
-                        <View style={{ flexDirection: 'row', justifyContent:'space-around', margin: 10}}>
-                            <Button success style={{width:70, justifyContent:'center', borderRadius:5}} ><Text style={{color:'#fff'}}>Edit</Text></Button>
-                            <Button danger style={{width:70, justifyContent:'center',borderRadius:5}} ><Text style={{color:'#fff'}}
-                                onPress={()=>{
-                                    this.popupDialog.dismiss(() => {
-                                        console.log('Called Cancel, dismiss popup')
-                                    });
-                                }}
-                            >Cancel</Text></Button>
-                        </View>
-                    </Content>
-                </PopupDialog>
+                <PopupDialogComponents ref={(popupDialogComponent) => {
+                    this.popupDialogComponent = popupDialogComponent;
+                }}/>
             </Container>
         );
     }
+
 }
 
 function initMapStateToProps(state) {
@@ -151,7 +119,7 @@ function initMapStateToProps(state) {
     }
 }
 
-export default connect(initMapStateToProps, {AddTodo,getData})(MainTodoList)
+export default connect(initMapStateToProps, {AddTodo, GetData, DeleteAll,DoneAll})(MainTodoList)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
