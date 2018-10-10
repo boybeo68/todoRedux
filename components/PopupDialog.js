@@ -31,6 +31,7 @@ import {editTodo} from '../redux/actionCreator'
         return (
             <PopupDialog
                 width={0.7} height={190}
+                //todo đặt tên cho components . lúc gọi lại chỉ cần gọi this.propupDialog
                 ref={(popupDialog) => {
                     this.popupDialog = popupDialog;
                 }}
