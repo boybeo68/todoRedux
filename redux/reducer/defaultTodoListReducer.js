@@ -20,7 +20,7 @@ const defaultTodoListReducer = (state = defaultTodoList, action) => {
             return [...state, ...action.data];
         case 'AddTodo' :
             return [{
-                id: state.length + 1,
+                id: Math.floor(Date.now() / 1000),
                 name: action.name,
                 done: false,
             }, ...state];
@@ -28,6 +28,7 @@ const defaultTodoListReducer = (state = defaultTodoList, action) => {
             return state.map(item => {
                 if (item.id !== action.id) {
                     return item
+
                 }
                 return {...item, name: action.name}
             });

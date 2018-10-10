@@ -16,16 +16,28 @@ class TodoItem extends Component {
                 {text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.deleteTodo(id)
+                        this.deleItem(id);
+
                     }
                 },
             ],
             {cancelable: true}
         );
     };
+    deleItem= async (id)=>{
+       await this.props.deleteTodo(id);
+        this._storeData(this.props.defaultTodoList)
+    };
     showEditModal = (popupDialogComponent,id,name) => {
         // todo sử dụng refs với redux
         popupDialogComponent.getWrappedInstance().editDialogComponent(id,name);
+    };
+    _storeData = async (todos) => {
+        try {
+            await AsyncStorage.setItem('todos', JSON.stringify(todos));
+        } catch (error) {
+            alert(error)
+        }
     };
 
     render() {
@@ -61,7 +73,13 @@ class TodoItem extends Component {
 }
 
 
-export default connect(null, {deleteTodo, editTodo, doneTdodo})(TodoItem);
+function mapStateToProps(state) {
+    return {
+        defaultTodoList: state.defaultTodoList
+    }
+}
+
+export default connect(mapStateToProps, {deleteTodo, editTodo, doneTdodo, })(TodoItem);
 const styles = StyleSheet.create({
     todoItem: {
         height: 50,

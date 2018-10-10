@@ -30,7 +30,7 @@ import {editTodo} from '../redux/actionCreator'
     render() {
         return (
             <PopupDialog
-                width={0.7} height={0.4}
+                width={0.7} height={190}
                 ref={(popupDialog) => {
                     this.popupDialog = popupDialog;
                 }}
@@ -56,7 +56,7 @@ import {editTodo} from '../redux/actionCreator'
                         borderColor: '#5067FF',
                         padding: 10,
                         marginHorizontal: 10,
-
+                        flex:1
                     }} placeholder='Edit todo ' autoCorrect={false}
                                underlineColorAndroid="transparent" placeholderTextColor='#8DA1D4'
                                value={this.state.name} onChangeText={text => this.setState({name: text})}
@@ -65,7 +65,7 @@ import {editTodo} from '../redux/actionCreator'
                                    this.popupDialog.dismiss()
                                }}
                     />
-                    <View style={{flexDirection: 'row', justifyContent: 'space-around', margin: 10}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-around', margin: 10, flex:1}}>
                         <Button success style={{width: 70, justifyContent: 'center', borderRadius: 5}} onPress={()=>{
                             this.props.editTodo(this.state.id,this.state.name);
                             this.popupDialog.dismiss()
